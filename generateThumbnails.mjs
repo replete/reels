@@ -35,6 +35,7 @@ const generateThumbnails = async () => {
   try {
     const videos = await Video.findAll({ where: { thumbnail: null } });
     for (const video of videos) {
+      // console.log(`Generating thumbnail ${index} of ${videos.count}`)
       await generateThumbnail(video);
     }
   } catch (err) {

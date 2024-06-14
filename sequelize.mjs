@@ -21,6 +21,39 @@ const Video = sequelize.define('Video', {
   tags: DataTypes.STRING,
 });
 
+const Tag = sequelize.define('Tag', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+});
+
+const VideoTag = sequelize.define('VideoTag', {
+  VideoId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Video,
+      key: 'id',
+    },
+  },
+  TagId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Tag,
+      key: 'id',
+    },
+  },
+});
+
+Video.belongsToMany(Tag, { through: VideoTag });
+Tag.belongsToMany(Video, { through: VideoTag });
+
 await sequelize.sync();
 
-export { sequelize, Video };
+export { sequelize, Video, Tag, VideoTag };

@@ -6,6 +6,7 @@ import { Video } from './sequelize.mjs';
 import indexVideos from './indexVideos.mjs';
 import generateThumbnails from './generateThumbnails.mjs';
 import getTranscriptions from './getTranscriptions.mjs';
+import generateTags from './generateTags.mjs';
 
 const app = express();
 const port = 3000;
@@ -18,6 +19,7 @@ if (!existsSync(audioDir)) {
 await indexVideos();
 await generateThumbnails();
 await getTranscriptions();
+await generateTags();
 
 app.use(express.static('public'));
 

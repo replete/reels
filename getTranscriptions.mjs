@@ -76,7 +76,8 @@ const getTranscriptions = async () => {
             { [Op.eq]: '' }
         ]
     } } });
-    for (const video of videos) {
+    for (const [index, video] of videos.entries()) {
+      console.log(`Generating transcript ${index} of ${videos.count}`)
       const audioPath = await generateWavFile(video);
       await transcribeAudio(video, audioPath);
     }
