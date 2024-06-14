@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video List</title>
+</head>
+<body>
+    <h1>Video List</h1>
+    <ul id="video-list"></ul>
+    <script>
+        fetch('/videos')
+            .then(response => response.json())
+            .then(videos => {
+                const list = document.getElementById('video-list');
+                videos.forEach(video => {
+                    const listItem = document.createElement('li');
+                    
+                    // Video link
+                    const videoLink = document.createElement('a');
+                    videoLink.href = `/player.html?slug=${video.slug}`;
+                    videoLink.textContent = video.filename;
+                    listItem.appendChild(videoLink);
+                    
+                    // Audio link
+                    const audioLink = document.createElement('a');
+                    audioLink.href = `/audio/${video.slug}`;
+                    audioLink.textContent = ' (Audio)';
+                    audioLink.style.marginLeft = '10px';
+                    audioLink.target = '_blank';
+                    listItem.appendChild(audioLink);
+                    
+                    // Add list item to the list
+                    list.appendChild(listItem);
+                });
+            });
+    </script>
+</body>
+</html>
