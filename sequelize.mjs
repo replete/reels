@@ -57,3 +57,4 @@ Tag.belongsToMany(Video, { through: VideoTag });
 await sequelize.sync();
 
 export { sequelize, Video, Tag, VideoTag };
+export default sequelize

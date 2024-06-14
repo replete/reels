@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program with nodemon",
+            "runtimeExecutable": "nodemon",
+            "runtimeArgs": [
+                "--inspect",   // Enables the inspector which allows attaching the debugger
+                "${workspaceFolder}/server.mjs"
+            ],
+            "program": "${workspaceFolder}/server.mjs",
+            "restart": true,
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        }
+    ]
+}

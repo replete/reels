@@ -34,12 +34,12 @@ const generateThumbnail = async (video) => {
 const generateThumbnails = async () => {
   try {
     const videos = await Video.findAll({ where: { thumbnail: null } });
-    for (const video of videos) {
-      // console.log(`Generating thumbnail ${index} of ${videos.count}`)
+    for (const [index, video] of videos.entries()) {
+      console.log(`[thumbnails] Generating thumbnail ${index + 1} of ${videos.count}`)
       await generateThumbnail(video);
     }
   } catch (err) {
-    console.error('Error generating thumbnails:', err);
+    console.error('[thumbnails] Error generating thumbnails:', err);
   }
 };
 

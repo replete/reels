@@ -8,6 +8,7 @@ const videosDir = join(process.cwd(), 'videos');
 const indexVideos = async () => {
   try {
     const files = await readdir(videosDir);
+    console.log(`[index] Indexing ${files.length} files...`)
     for (const file of files) {
       if (file.endsWith('.mp4')) {
         const slug = sanitize(file.replace(/\s+/g, '_'));
@@ -18,7 +19,7 @@ const indexVideos = async () => {
       }
     }
   } catch (err) {
-    console.error('Error indexing videos:', err);
+    console.error('[index] Error indexing videos:', err);
   }
 };
 

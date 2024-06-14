@@ -39,14 +39,15 @@ const transcribeAudio = async (video, audioPath) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
+      throw new Error(`[transcribe] HTTP error! Status: ${response.status}, Response: ${errorText}`);
     }
     const responseText = await response.text();
-    const transcript = JSON.parse(responseText).text;
-    console.log(`Transcript for ${video.filename}: ${ transcript }`);
+    let transcript = JSON.parse(responseText).text;
+    if (transcript === '') transcript = '-' // no speech detected
+    console.log(`[transcribe] Transcript for ${video.filename}: ${ transcript }`);
     await video.update({ transcript });
   } catch (error) {
-    console.error(`Error transcribing ${video.filename}:`, error.message);
+    console.error(`[transcribe] Error transcribing ${video.filename}:`, error.message);
   } finally {
     await unlink(audioPath);
   }
@@ -54,17 +55,30 @@ const transcribeAudio = async (video, audioPath) => {
 
 const generateWavFile = async (video) => {
   const videoPath = join(process.cwd(), 'videos', video.filename);
-  const audioPath = join(audioDir, `${video.slug}.wav`);
+  const audioPath = join(process.cwd(), 'audio', `${video.slug}.wav`);
 
   return new Promise((resolve, reject) => {
-    ffmpeg(videoPath)
-      .noVideo()
-      .audioCodec('pcm_s16le')
-      .audioFrequency(16000)
-      .toFormat('wav')
-      .on('error', (err) => reject(err))
-      .on('end', () => resolve(audioPath))
-      .save(audioPath);
+    ffmpeg.ffprobe(videoPath, (err, metadata) => {
+      if (err) {
+        return reject(new Error(`[transcribe] Error probing video file: ${err.message}`));
+      }
+
+      const hasAudio = metadata.streams.some((stream) => stream.codec_type === 'audio');
+
+      if (!hasAudio) {
+        console.log(`[transcribe] No audio stream found in ${video.filename}, skipping.`);
+        return resolve(join(process.cwd(), 'audio', 'silence.wav')); // include path to silent WAV if no audio
+      }
+
+      ffmpeg(videoPath)
+        .noVideo()
+        .audioCodec('pcm_s16le')
+        .audioFrequency(16000)
+        .toFormat('wav')
+        .on('error', (err) => reject(new Error(`[transcribe] Error processing audio: ${err.message}`)))
+        .on('end', () => resolve(audioPath))
+        .save(audioPath);
+    });
   });
 };
 
@@ -77,12 +91,16 @@ const getTranscriptions = async () => {
         ]
     } } });
     for (const [index, video] of videos.entries()) {
-      console.log(`Generating transcript ${index} of ${videos.count}`)
+      console.log(`[transcribe] Generating transcripts: ${index + 1} of ${videos.length}`)
       const audioPath = await generateWavFile(video);
-      await transcribeAudio(video, audioPath);
+      if (audioPath) {
+        await transcribeAudio(video, audioPath);
+      } else {
+        console.log(`[transcribe] Skipping transcription for ${video.filename} due to lack of audio stream.`);
+      }
     }
   } catch (error) {
-    console.error('Error processing transcriptions:', error.message);
+    console.error('[transcribe] Error processing transcriptions:', error.message);
   }
 };
 

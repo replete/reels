@@ -19,7 +19,7 @@ if (!existsSync(audioDir)) {
 await indexVideos();
 await generateThumbnails();
 await getTranscriptions();
-await generateTags();
+generateTags();
 
 app.use(express.static('public'));
 
@@ -82,5 +82,5 @@ app.get('/audio/:slug', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`[server] Server is running on http://localhost:${port}`);
 });
