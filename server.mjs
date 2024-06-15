@@ -2,6 +2,10 @@ import express from 'express';
 import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import ffmpeg from 'fluent-ffmpeg';
+import * as tf from '@tensorflow/tfjs';
+import use from '@tensorflow-models/universal-sentence-encoder';
+import cosineSimilarity from 'compute-cosine-similarity';
+
 import { Video, Tag } from './sequelize.mjs';
 import indexVideos from './indexVideos.mjs';
 import generateThumbnails from './generateThumbnails.mjs';
@@ -19,9 +23,10 @@ if (!existsSync(audioDir)) {
 await indexVideos();
 generateThumbnails();
 await getTranscriptions();
-await generateTags();
+generateTags();
 
 app.use(express.static('public'));
+
 
 app.get('/videos', async (req, res) => {
   const videos = await Video.findAll({
@@ -40,6 +45,48 @@ app.get('/tags', async (req, res) => {
     console.error('Error fetching tags:', error.message);
     res.status(500).json({ error: 'Failed to fetch tags' });
   }
+});
+
+
+
+let model;
+
+// Load the Universal Sentence Encoder model
+await use.load().then(loadedModel => {
+    model = loadedModel;
+    console.log('Universal Sentence Encoder loaded');
+});
+
+// Function to get embeddings
+async function getEmbeddings(tags) {
+    const embeddings = await model.embed(tags);
+    return embeddings.array();
+}
+
+// Function to compute tag similarity
+async function getSimilarTags(tag, allTags) {
+    const allTagsArray = [tag, ...allTags];
+    const embeddings = await getEmbeddings(allTagsArray);
+
+    const tagVector = embeddings[0];
+    const similarities = allTags.map((otherTag, index) => {
+        const otherTagVector = embeddings[index + 1];
+        return { tag: otherTag, similarity: cosineSimilarity(tagVector, otherTagVector) };
+    });
+
+    // Sort tags by similarity in descending order
+    similarities.sort((a, b) => b.similarity - a.similarity);
+    return similarities;
+}
+
+app.get('/similar-tags', async (req, res) => {
+    const { tag } = req.query;
+    const tags = await Tag.findAll({
+      attributes: ['id', 'name']
+    });
+    const tagsArray = tags.map(tag => tag.name);
+    const similarTags = await getSimilarTags(tag, tagsArray);
+    res.json({similarTags});
 });
 
 app.get('/video/:slug', async (req, res) => {

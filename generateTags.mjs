@@ -17,7 +17,7 @@ const generateTags = async () => {
 
     for (const [index, video] of videos.entries()) {
 
-      console.log(`[tags] Generating tags from videos: ${index + 1} of ${videos.length}`)
+      console.log(`[tags] Generating tags for video ${index + 1} of ${videos.length}`)
 
       // const prompt = `Generate 5-10 topical hashtags from the following video transcript. Each hashtag should be a single word or phrase, as simple as possible. Use dashes, never underscores. Only include the hashtags in the response, comma-separated, on a single line.
       // "${video.transcript}"`;
