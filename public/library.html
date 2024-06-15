@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Library</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .video {
+        width: 100%; /* Adjust the width as needed */
+        position: relative;
+        padding-bottom: 177.78%;
+        background-size: cover;
+        background-position: center center;
+        border-radius: 15px;
+
+        > div {
+            position:absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display:flex;
+            color: #fff;
+            font-size:14px;
+        }
+
+        .content {
+            height:auto;
+            margin-top: auto;
+            color: rgba(255,255,255,0.7);
+            padding:30px;
+            line-height:1.em;
+        }
+    }
+  </style>
+</head>
+<body>
+  <div id="videos"></div>
+  <script>
+    (async (d) => {
+      const response = await fetch('/videos');
+      const { videos } = await response.json();
+
+      videos.forEach(video => {
+        const {tags, transcript, filename, slug, thumbnail} = video;
+
+        const el = d.createElement('article');
+        el.setAttribute('style', `background-image: url('/thumbs/${thumbnail}')`);
+        el.classList.add('video');
+        el.innerHTML = `
+        <div>
+            <div class="content">
+                <p class="transcript">${transcript}</p>
+                <p class="tags">${tags && tags.split(',').map(tag => `<b>${tag}</b>`)}</p>
+            </div>
+        </div>
+        `
+        d.getElementById('videos').appendChild(el);
+      });
+    })(document)
+  </script>
+</body>
+</html>
