@@ -2,7 +2,7 @@ import express from 'express';
 import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import ffmpeg from 'fluent-ffmpeg';
-import { Video } from './sequelize.mjs';
+import { Video, Tag } from './sequelize.mjs';
 import indexVideos from './indexVideos.mjs';
 import generateThumbnails from './generateThumbnails.mjs';
 import getTranscriptions from './getTranscriptions.mjs';
@@ -17,15 +17,29 @@ if (!existsSync(audioDir)) {
 }
 
 await indexVideos();
-await generateThumbnails();
+generateThumbnails();
 await getTranscriptions();
-generateTags();
+await generateTags();
 
 app.use(express.static('public'));
 
 app.get('/videos', async (req, res) => {
-  const videos = await Video.findAll();
-  res.json(videos);
+  const videos = await Video.findAll({
+    attributes: ['id', 'slug', 'filename','transcript','thumbnail','tags']
+  });
+  res.json({videos});
+});
+
+app.get('/tags', async (req, res) => {
+  try {
+    const tags = await Tag.findAll({
+      attributes: ['id', 'name']
+    });
+    res.json({tags});
+  } catch (error) {
+    console.error('Error fetching tags:', error.message);
+    res.status(500).json({ error: 'Failed to fetch tags' });
+  }
 });
 
 app.get('/video/:slug', async (req, res) => {

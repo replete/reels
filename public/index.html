@@ -10,6 +10,7 @@
         fetch('/videos')
             .then(response => response.json())
             .then(videos => {
+                console.log(videos);
                 const list = document.getElementById('video-list');
                 videos.forEach(video => {
                     const listItem = document.createElement('li');
