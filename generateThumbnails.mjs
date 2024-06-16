@@ -4,7 +4,7 @@ import ffmpeg from 'fluent-ffmpeg';
 import { Video } from './sequelize.mjs';
 
 const videosDir = join(process.cwd(), 'videos');
-const thumbsDir = join(process.cwd(), 'thumbs');
+const thumbsDir = join(process.cwd(), 'videos/thumbs');
 
 if (!existsSync(thumbsDir)) {
   mkdirSync(thumbsDir);

@@ -26,7 +26,7 @@ await getTranscriptions();
 generateTags();
 
 app.use(express.static('public'));
-app.use('/thumbs', express.static(join(process.cwd(), 'thumbs')));
+app.use('/thumbs', express.static(join(process.cwd(), 'videos/thumbs')));
 
 
 app.get('/videos', async (req, res) => {

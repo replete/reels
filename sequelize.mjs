@@ -7,7 +7,7 @@ const __dirname = dirname(__filename);
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: join(__dirname, 'database.sqlite'),
+  storage: join(__dirname, '/videos/database/videos.sqlite'),
 });
 
 const Video = sequelize.define('Video', {
