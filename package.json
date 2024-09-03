@@ -1,9 +1,10 @@
 {
-  "name": "reels",
-  "version": "1.0.0",
+  "name": "localreels",
+  "version": "0.2.0",
   "description": "Local instagram reels video browser with tags",
   "main": "server.js",
   "type": "module",
+	"engines": { "node": ">=20"},
   "dependencies": {
     "@tensorflow-models/universal-sentence-encoder": "^1.3.3",
     "@tensorflow/tfjs": "^4.20.0",
@@ -23,6 +24,6 @@
     "start": "node server.mjs",
     "dev": "nodemon server.mjs"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "Phil Ricketts",
+  "license": "MIT"
 }
